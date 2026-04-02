@@ -5,6 +5,7 @@ import {Script, console} from "forge-std/Script.sol";
 import {AMM} from "../src/AMM.sol";
 import {PointsHook} from "../src/PointsHook.sol";
 import {DynamicFeeHook} from "../src/DynamicFeeHook.sol";
+import {PositionManager} from "../src/PositionManager.sol";
 import {MockERC20} from "../src/mocks/MockERC20.sol";
 
 contract DeployScript is Script {
@@ -25,7 +26,10 @@ contract DeployScript is Script {
         // 3. Desplegar AMM
         AMM amm = new AMM(address(token0), address(token1), address(hook), address(dynamicFeeHook));
 
-        // 4. Configurar Hooks para que reconozcan al AMM
+        // 4. Desplegar Position Manager
+        PositionManager positionManager = new PositionManager(address(amm));
+
+        // 5. Configurar Hooks para que reconozcan al AMM
         hook.setAmmAddress(address(amm));
         dynamicFeeHook.setAmmAddress(address(amm));
 
@@ -34,8 +38,9 @@ contract DeployScript is Script {
         console.log("Token1 (TKNB) Address:", address(token1));
         console.log("PointsHook (ERC1155) Address:", address(hook));
         console.log("AMM Contract Address:", address(amm));
+        console.log("PositionManager Address:", address(positionManager));
 
-        // 5. Acuñar algo de liquidez inicial al deployer para pruebas
+        // 6. Acuñar algo de liquidez inicial al deployer para pruebas
         address deployer = vm.addr(deployerPrivateKey);
         token0.mint(deployer, 1000000 ether);
         token1.mint(deployer, 1000000 ether);
